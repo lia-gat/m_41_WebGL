@@ -1,35 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Three.js — Геометрические фигуры</title>
     <meta charset="utf-8" />
+    <title>three.js — Геометрические фигуры</title>
     <meta
       name="viewport"
       content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="https://threejs.org/examples/main.css"
-    />
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: #000;
+        font-family: sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
     <div id="info">Трехмерные фигуры</div>
 
-    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
-
     <script type="importmap">
       {
         "imports": {
-          "three": "https://threejs.org/build/three.module.js",
-          "three/addons/": "https://threejs.org/examples/jsm/"
+          "three": "https://threejs.org/build/three.module.js"
         }
       }
     </script>
 
     <script type="module">
       import * as THREE from "three";
-      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
+      // import { TeapotGeometry } from "https://threejs.org/examples/jsm/geometries/TeapotGeometry.js";
 
       let camera, scene, renderer, controls;
 
@@ -37,91 +46,130 @@
       animate();
 
       function init() {
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xd3d3d3);
+        const container = document.createElement("div");
+        document.body.appendChild(container);
 
+        // Камера
         camera = new THREE.PerspectiveCamera(
           45,
           window.innerWidth / window.innerHeight,
           1,
           5000
         );
-        camera.position.set(800, 400, 1000);
+        camera.position.set(500, 600, 1200);
 
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        const light = new THREE.DirectionalLight(0xffffff, 1);
+        // Освещение
+        const ambientLight = new THREE.AmbientLight(0x555555);
+        const light = new THREE.DirectionalLight(0xffffff, 1.0);
         light.position.set(1, 1, 1);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x888888));
 
+        // Рендерер
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // Контролы
         controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.minDistance = 300;
-        controls.maxDistance = 2000;
+        controls.minDistance = 500;
+        controls.maxDistance = 2500;
 
-        const geometries = [];
-        const materials = [];
+        // Сцена
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color("#CDF1FF");
+        scene.add(ambientLight);
+        scene.add(light);
 
-        // Сфера
-        geometries.push(new THREE.SphereGeometry(80, 32, 32));
-        materials.push(new THREE.MeshPhongMaterial({ color: 0xff0000 }));
+        // === Геометрические фигуры ===
 
-        // Цилиндр
-        geometries.push(new THREE.CylinderGeometry(60, 60, 160, 32));
-        materials.push(new THREE.MeshPhongMaterial({ color: 0x007bff }));
+        // 1. Сфера
+        let sphere = new THREE.Mesh(
+          new THREE.SphereGeometry(100, 32, 32),
+          new THREE.MeshPhongMaterial({ color: "#FF0000" })
+        );
+        sphere.position.set(-400, 0, -400);
+        scene.add(sphere);
 
-        // Куб
-        geometries.push(new THREE.BoxGeometry(140, 140, 140));
-        materials.push(new THREE.MeshPhongMaterial({ color: 0xffa500 }));
+        // 2. Цилиндр
+        let cylinder = new THREE.Mesh(
+          new THREE.CylinderGeometry(80, 80, 200, 64),
+          new THREE.MeshPhongMaterial({ color: "#007BFF" })
+        );
+        cylinder.position.set(0, 0, -400);
+        scene.add(cylinder);
 
-        // Пирамида (четырёхгранная)
-        geometries.push(new THREE.ConeGeometry(100, 160, 4));
-        materials.push(new THREE.MeshPhongMaterial({ color: 0xff69b4 }));
+        // 3. Куб
+        let cube = new THREE.Mesh(
+          new THREE.BoxGeometry(160, 160, 160),
+          new THREE.MeshPhongMaterial({ color: "orange" })
+        );
+        cube.position.set(400, 0, -400);
+        scene.add(cube);
 
-        // Тор
-        geometries.push(new THREE.TorusGeometry(70, 25, 16, 100));
-        materials.push(new THREE.MeshPhongMaterial({ color: 0x800080 }));
+        //Пирамида
+        let pyramid = new THREE.Mesh(
+          new THREE.ConeGeometry(100, 200, 4),
+          new THREE.MeshPhongMaterial({ color: "pink" })
+        );
+        pyramid.position.set(-400, 0, 0);
+        scene.add(pyramid);
 
-        // Конус
-        geometries.push(new THREE.ConeGeometry(80, 180, 32));
-        materials.push(new THREE.MeshPhongMaterial({ color: 0xcd853f }));
+        //Тор
+        let torus = new THREE.Mesh(
+          new THREE.TorusGeometry(100, 30, 16, 100),
+          new THREE.MeshPhongMaterial({ color: "#8506A9" })
+        );
+        torus.position.set(0, 0, 0);
+        torus.rotation.x = Math.PI / 2;
+        scene.add(torus);
 
-        // Призма (треугольная)
-        const prismShape = new THREE.CylinderGeometry(80, 80, 160, 3);
-        geometries.push(prismShape);
-        materials.push(new THREE.MeshPhongMaterial({ color: 0xda70d6 }));
+        //Конус
+        let cone = new THREE.Mesh(
+          new THREE.ConeGeometry(100, 200, 32),
+          new THREE.MeshPhongMaterial({ color: "#986C50" })
+        );
+        cone.position.set(400, 0, 0);
+        scene.add(cone);
 
-        // Кубоид (прямоугольный параллелепипед)
-        geometries.push(new THREE.BoxGeometry(200, 100, 120));
-        materials.push(new THREE.MeshPhongMaterial({ color: 0xffd700 }));
+        //Призма (треугольная)
+        let prism = new THREE.Mesh(
+          new THREE.CylinderGeometry(80, 80, 180, 3),
+          new THREE.MeshPhongMaterial({ color: "#FF00F4" })
+        );
+        prism.position.set(-400, 0, 400);
+        prism.rotation.z = Math.PI / 2; // положена на бок
+        scene.add(prism);
+
+        //Кубоид (прямоугольный параллелепипед)
+        let cuboid = new THREE.Mesh(
+          new THREE.BoxGeometry(200, 100, 120),
+          new THREE.MeshPhongMaterial({ color: "#FFDD00" })
+        );
+        cuboid.position.set(0, 0, 400);
+        scene.add(cuboid);
 
         // Полусфера
-        const hemi = new THREE.SphereGeometry(80, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-        geometries.push(hemi);
-        materials.push(new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
+        let hemisphere = new THREE.Mesh(
+          new THREE.SphereGeometry(100, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+          new THREE.MeshPhongMaterial({ color: "green" })
+        );
+        hemisphere.position.set(400, 0, 400);
+        scene.add(hemisphere);
 
-        // Расположение фигур в 3x3 сетке
-        const positions = [
-          [-300, 150, 0],
-          [0, 150, 0],
-          [300, 150, 0],
-          [-300, -100, 0],
-          [0, -100, 0],
-          [300, -100, 0],
-          [-300, -350, 0],
-          [0, -350, 0],
-          [300, -350, 0],
-        ];
+        // // Чайник
+        // let teapot = new THREE.Mesh(
+        //   new TeapotGeometry(70),
+        //   new THREE.MeshPhongMaterial({ color: "#72B29E" })
+        // );
+        // teapot.position.set(0, 400, 0);
+        // scene.add(teapot);
 
-        for (let i = 0; i < geometries.length; i++) {
-          const mesh = new THREE.Mesh(geometries[i], materials[i]);
-          mesh.position.set(positions[i][0], positions[i][1], positions[i][2]);
-          scene.add(mesh);
-        }
+        // Сетка-помощник
+        const helper = new THREE.GridHelper(1000, 10);
+        scene.add(helper);
 
+        // Слушатель событий
         window.addEventListener("resize", onWindowResize);
       }
 
