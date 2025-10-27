@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Three.js — Геометрические фигуры</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://threejs.org/examples/main.css"
+    />
+  </head>
+  <body>
+    <div id="info">Трехмерные фигуры</div>
+
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://threejs.org/build/three.module.js",
+          "three/addons/": "https://threejs.org/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      let camera, scene, renderer, controls;
+
+      init();
+      animate();
+
+      function init() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xd3d3d3);
+
+        camera = new THREE.PerspectiveCamera(
+          45,
+          window.innerWidth / window.innerHeight,
+          1,
+          5000
+        );
+        camera.position.set(800, 400, 1000);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(1, 1, 1);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x888888));
+
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.minDistance = 300;
+        controls.maxDistance = 2000;
+
+        const geometries = [];
+        const materials = [];
+
+        // Сфера
+        geometries.push(new THREE.SphereGeometry(80, 32, 32));
+        materials.push(new THREE.MeshPhongMaterial({ color: 0xff0000 }));
+
+        // Цилиндр
+        geometries.push(new THREE.CylinderGeometry(60, 60, 160, 32));
+        materials.push(new THREE.MeshPhongMaterial({ color: 0x007bff }));
+
+        // Куб
+        geometries.push(new THREE.BoxGeometry(140, 140, 140));
+        materials.push(new THREE.MeshPhongMaterial({ color: 0xffa500 }));
+
+        // Пирамида (четырёхгранная)
+        geometries.push(new THREE.ConeGeometry(100, 160, 4));
+        materials.push(new THREE.MeshPhongMaterial({ color: 0xff69b4 }));
+
+        // Тор
+        geometries.push(new THREE.TorusGeometry(70, 25, 16, 100));
+        materials.push(new THREE.MeshPhongMaterial({ color: 0x800080 }));
+
+        // Конус
+        geometries.push(new THREE.ConeGeometry(80, 180, 32));
+        materials.push(new THREE.MeshPhongMaterial({ color: 0xcd853f }));
+
+        // Призма (треугольная)
+        const prismShape = new THREE.CylinderGeometry(80, 80, 160, 3);
+        geometries.push(prismShape);
+        materials.push(new THREE.MeshPhongMaterial({ color: 0xda70d6 }));
+
+        // Кубоид (прямоугольный параллелепипед)
+        geometries.push(new THREE.BoxGeometry(200, 100, 120));
+        materials.push(new THREE.MeshPhongMaterial({ color: 0xffd700 }));
+
+        // Полусфера
+        const hemi = new THREE.SphereGeometry(80, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+        geometries.push(hemi);
+        materials.push(new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
+
+        // Расположение фигур в 3x3 сетке
+        const positions = [
+          [-300, 150, 0],
+          [0, 150, 0],
+          [300, 150, 0],
+          [-300, -100, 0],
+          [0, -100, 0],
+          [300, -100, 0],
+          [-300, -350, 0],
+          [0, -350, 0],
+          [300, -350, 0],
+        ];
+
+        for (let i = 0; i < geometries.length; i++) {
+          const mesh = new THREE.Mesh(geometries[i], materials[i]);
+          mesh.position.set(positions[i][0], positions[i][1], positions[i][2]);
+          scene.add(mesh);
+        }
+
+        window.addEventListener("resize", onWindowResize);
+      }
+
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
+</html>
