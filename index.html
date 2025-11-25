@@ -151,9 +151,10 @@
           new THREE.MeshPhongMaterial({ color: "#FF00F4" })
         );
         prism.position.set(-400, 90, 400);
-        prism.rotation.z = Math.PI / 3; // положена на бок
+        prism.rotation.z = Math.PI / 2; // положена на бок
+        prism.rotation.x = (Math.PI**(1/2)) / 4;
         scene.add(prism);
-        prism.height = 90;
+        prism.height = 50;
         dragObjects.push(prism);
 
         // Кубоид (прямоугольный параллелепипед)
@@ -173,7 +174,7 @@
         );
         hemisphere.position.set(400, 100, 400);
         scene.add(hemisphere);
-        hemisphere.height = 50;
+        hemisphere.height = 0;
         dragObjects.push(hemisphere);
 
         // Сетка-помощник
@@ -231,4 +232,5 @@
     </script>
   </body>
 </html>
+
 
