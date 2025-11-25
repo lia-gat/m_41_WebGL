@@ -25,7 +25,7 @@
     </style>
   </head>
   <body>
-    <div id="info">Трехмерные фигуры</div>
+    <div id="info">Трехмерные фигуры (перетаскивайте фигуры мышью)</div>
 
     <script type="importmap">
       {
@@ -38,9 +38,9 @@
     <script type="module">
       import * as THREE from "three";
       import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
-      // import { TeapotGeometry } from "https://threejs.org/examples/jsm/geometries/TeapotGeometry.js";
+      import { EventControls } from 'https://alexan0308.github.io/threejs/examples/js/controls/EventControls.js';
 
-      let camera, scene, renderer, controls;
+      let camera, scene, renderer, controls, eventControl;
       const dragObjects = [];
 
       init();
@@ -89,8 +89,9 @@
           new THREE.SphereGeometry(100, 32, 32),
           new THREE.MeshPhongMaterial({ color: "#FF0000" })
         );
-        sphere.position.set(-400, 0, -400);
+        sphere.position.set(-400, 100, -400);
         scene.add(sphere);
+        sphere.height = 100; // Добавляем высоту для корректного позиционирования
         dragObjects.push(sphere);
 
         // 2. Цилиндр
@@ -98,8 +99,9 @@
           new THREE.CylinderGeometry(80, 80, 200, 64),
           new THREE.MeshPhongMaterial({ color: "#007BFF" })
         );
-        cylinder.position.set(0, 0, -400);
+        cylinder.position.set(0, 100, -400);
         scene.add(cylinder);
+        cylinder.height = 100;
         dragObjects.push(cylinder);
 
         // 3. Куб
@@ -107,55 +109,61 @@
           new THREE.BoxGeometry(160, 160, 160),
           new THREE.MeshPhongMaterial({ color: "orange" })
         );
-        cube.position.set(400, 0, -400);
+        cube.position.set(400, 80, -400);
         scene.add(cube);
+        cube.height = 80;
         dragObjects.push(cube);
 
-        //Пирамида
+        // Пирамида
         let pyramid = new THREE.Mesh(
           new THREE.ConeGeometry(100, 200, 4),
           new THREE.MeshPhongMaterial({ color: "pink" })
         );
-        pyramid.position.set(-400, 0, 0);
+        pyramid.position.set(-400, 100, 0);
         scene.add(pyramid);
+        pyramid.height = 100;
         dragObjects.push(pyramid);
 
-        //Тор
+        // Тор
         let torus = new THREE.Mesh(
           new THREE.TorusGeometry(100, 30, 16, 100),
           new THREE.MeshPhongMaterial({ color: "#8506A9" })
         );
-        torus.position.set(0, 0, 0);
+        torus.position.set(0, 30, 0);
         torus.rotation.x = Math.PI / 2;
         scene.add(torus);
+        torus.height = 30;
         dragObjects.push(torus);
 
-        //Конус
+        // Конус
         let cone = new THREE.Mesh(
           new THREE.ConeGeometry(100, 200, 32),
           new THREE.MeshPhongMaterial({ color: "#986C50" })
         );
-        cone.position.set(400, 0, 0);
+        cone.position.set(400, 100, 0);
         scene.add(cone);
+        cone.height = 100;
         dragObjects.push(cone);
 
-        //Призма (треугольная)
+        // Призма (треугольная)
         let prism = new THREE.Mesh(
           new THREE.CylinderGeometry(80, 80, 180, 3),
           new THREE.MeshPhongMaterial({ color: "#FF00F4" })
         );
-        prism.position.set(-400, 0, 400);
+        prism.position.set(-400, 90, 400);
         prism.rotation.z = Math.PI / 2; // положена на бок
         scene.add(prism);
+        prism.height = 90;
         dragObjects.push(prism);
 
-        //Кубоид (прямоугольный параллелепипед)
+        // Кубоид (прямоугольный параллелепипед)
         let cuboid = new THREE.Mesh(
           new THREE.BoxGeometry(200, 100, 120),
           new THREE.MeshPhongMaterial({ color: "#FFDD00" })
         );
-        cuboid.position.set(0, 0, 400);
+        cuboid.position.set(0, 50, 400);
         scene.add(cuboid);
+        cuboid.height = 50;
         dragObjects.push(cuboid);
 
         // Полусфера
@@ -163,21 +171,43 @@
           new THREE.SphereGeometry(100, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
           new THREE.MeshPhongMaterial({ color: "green" })
         );
-        hemisphere.position.set(400, 0, 400);
+        hemisphere.position.set(400, 100, 400);
         scene.add(hemisphere);
+        hemisphere.height = 100;
         dragObjects.push(hemisphere);
-
-        // // Чайник
-        // let teapot = new THREE.Mesh(
-        //   new TeapotGeometry(70),
-        //   new THREE.MeshPhongMaterial({ color: "#72B29E" })
-        // );
-        // teapot.position.set(0, 400, 0);
-        // scene.add(teapot);
 
         // Сетка-помощник
         const helper = new THREE.GridHelper(1000, 10);
         scene.add(helper);
+
+        // Создаем плоскость для перемещения объектов
+        const planeGeometry = new THREE.PlaneGeometry(1200, 1200, 1, 1);
+        const planeMaterial = new THREE.MeshPhongMaterial({ 
+          color: 0xD3D3D3, 
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.3
+        });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.position.y = -1;
+        plane.rotation.x = Math.PI / 2;
+        scene.add(plane);
+
+        // Инициализация EventControls
+        eventControl = new EventControls(dragObjects, camera, renderer.domElement);
+        eventControl.setDraggable(render, true);
+        eventControl.setMap(plane);
+        eventControl.setOrbitControl(controls);
+
+        // Обработчик события перетаскивания
+        eventControl.attachEvent('dragAndDrop', function () {
+          // Корректируем позицию после перетаскивания
+          this.event.object.position.y = this.event.object.height;
+          
+          // Привязываем к сетке (опционально)
+          this.event.object.position.x = 50 * Math.round(this.event.object.position.x / 50);
+          this.event.object.position.z = 50 * Math.round(this.event.object.position.z / 50);
+        });
 
         // Слушатель событий
         window.addEventListener("resize", onWindowResize);
@@ -194,7 +224,10 @@
         controls.update();
         renderer.render(scene, camera);
       }
+
+      function render() {
+        renderer.render(scene, camera);
+      }
     </script>
   </body>
 </html>
-
