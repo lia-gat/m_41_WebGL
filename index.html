@@ -151,7 +151,7 @@
           new THREE.MeshPhongMaterial({ color: "#FF00F4" })
         );
         prism.position.set(-400, 90, 400);
-        prism.rotation.z = Math.PI / 2; // положена на бок
+        prism.rotation.z = Math.PI / 3; // положена на бок
         scene.add(prism);
         prism.height = 90;
         dragObjects.push(prism);
@@ -173,7 +173,7 @@
         );
         hemisphere.position.set(400, 100, 400);
         scene.add(hemisphere);
-        hemisphere.height = 100;
+        hemisphere.height = 50;
         dragObjects.push(hemisphere);
 
         // Сетка-помощник
@@ -231,3 +231,4 @@
     </script>
   </body>
 </html>
+
