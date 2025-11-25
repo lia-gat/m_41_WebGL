@@ -41,6 +41,7 @@
       // import { TeapotGeometry } from "https://threejs.org/examples/jsm/geometries/TeapotGeometry.js";
 
       let camera, scene, renderer, controls;
+      const dragObjects = [];
 
       init();
       animate();
@@ -90,6 +91,7 @@
         );
         sphere.position.set(-400, 0, -400);
         scene.add(sphere);
+        dragObjects.push(sphere);
 
         // 2. Цилиндр
         let cylinder = new THREE.Mesh(
@@ -98,6 +100,7 @@
         );
         cylinder.position.set(0, 0, -400);
         scene.add(cylinder);
+        dragObjects.push(cylinder);
 
         // 3. Куб
         let cube = new THREE.Mesh(
@@ -106,6 +109,7 @@
         );
         cube.position.set(400, 0, -400);
         scene.add(cube);
+        dragObjects.push(cube);
 
         //Пирамида
         let pyramid = new THREE.Mesh(
@@ -114,6 +118,7 @@
         );
         pyramid.position.set(-400, 0, 0);
         scene.add(pyramid);
+        dragObjects.push(pyramid);
 
         //Тор
         let torus = new THREE.Mesh(
@@ -123,6 +128,7 @@
         torus.position.set(0, 0, 0);
         torus.rotation.x = Math.PI / 2;
         scene.add(torus);
+        dragObjects.push(torus);
 
         //Конус
         let cone = new THREE.Mesh(
@@ -131,6 +137,7 @@
         );
         cone.position.set(400, 0, 0);
         scene.add(cone);
+        dragObjects.push(cone);
 
         //Призма (треугольная)
         let prism = new THREE.Mesh(
@@ -140,6 +147,7 @@
         prism.position.set(-400, 0, 400);
         prism.rotation.z = Math.PI / 2; // положена на бок
         scene.add(prism);
+        dragObjects.push(prism);
 
         //Кубоид (прямоугольный параллелепипед)
         let cuboid = new THREE.Mesh(
@@ -148,6 +156,7 @@
         );
         cuboid.position.set(0, 0, 400);
         scene.add(cuboid);
+        dragObjects.push(cuboid);
 
         // Полусфера
         let hemisphere = new THREE.Mesh(
@@ -156,6 +165,7 @@
         );
         hemisphere.position.set(400, 0, 400);
         scene.add(hemisphere);
+        dragObjects.push(hemisphere);
 
         // // Чайник
         // let teapot = new THREE.Mesh(
@@ -187,3 +197,4 @@
     </script>
   </body>
 </html>
+
